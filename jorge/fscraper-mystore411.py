@@ -20,7 +20,7 @@
 # Automatically retrieves the store ID from the store name inputted
 # 
 
-# In[ ]:
+# In[40]:
 
 
 # initializations
@@ -34,7 +34,7 @@ import urllib2
 import requests
 
 
-# In[ ]:
+# In[41]:
 
 
 ## these two lines to avoid the SSL error
@@ -42,10 +42,18 @@ import ssl
 context = context = ssl._create_unverified_context()
 
 
-# In[ ]:
+# In[42]:
 
 
 def getStoreID(StoreName):
+    
+    # here reads the top biz url!
+    store = urllib2.urlopen(url,context = context)
+    #import the Beautiful soup functions to parse the data returned from the website
+    from bs4 import BeautifulSoup
+    #Parse the html in the 'store' variable, and store it in Beautiful Soup format
+    soup = BeautifulSoup(store)
+
     print("In getstoreID f")
     ## Get the store ID for storeName
     sid = "XXX"
@@ -61,7 +69,7 @@ def getStoreID(StoreName):
     return sid
 
 
-# In[ ]:
+# In[43]:
 
 
 def getGeoloc(add):
@@ -78,12 +86,12 @@ def getGeoloc(add):
     lat = json_dict['results'][0]['geometry']['location']['lat']
     lng = json_dict['results'][0]['geometry']['location']['lng']
     
-    ll = str(lat) + " " + str(lng)
+    ll = str(lat) + "," + str(lng)
     
     return ll
 
 
-# In[ ]:
+# In[44]:
 
 
 def getAddress(storeURL):
@@ -116,13 +124,13 @@ def getAddress(storeURL):
     return add
 
 
-# In[ ]:
+# In[45]:
 
 
 ## TESTING BLOCK TO RETRIEVE BIZ CATEGORY (2) EXECUTE
 
 def getCategory(category):
-    
+        
     url = "https://mystore411.com"
 
     store = urllib2.urlopen(url,context = context) ## first url with category
@@ -131,7 +139,7 @@ def getCategory(category):
     soup = BeautifulSoup(store)
     
     ## print(soup)
-    cid ="X"
+    
     for a in soup.find_all("a", href=True):
         
         print("category is", category)
@@ -153,72 +161,95 @@ def getCategory(category):
             print("getCategory Found id is ", cid)
         
             break
+        else:
+            cid = "X"
             
     return cid
 
 
-# In[ ]:
+# In[46]:
 
 
-## TESTING BLOCK TO RETRIEVE BIZ CATEGORY (1) EXECUTE
+def getAddfromLL(ll):
+    from geopy.geocoders import GoogleV3
 
-category = raw_input('Enter a valid business category in mystore411.com: ') ## not used to validate anything
-print("category is " + category)
+    ##point = '52.157927, -106.660661' #
+    ##print("ll from getAddfromLL is ", ll)
 
-storeName = raw_input('Enter a valid store Name in mystore411.com: ')
-print('storeName is '+  storeName)
-
-url = "https://mystore411.com"
-
-store = urllib2.urlopen(url,context = context) ## first url with category
-print("url for top biz is", url)
-from bs4 import BeautifulSoup
-soup = BeautifulSoup(store)
-
-cid = getCategory(category)
-
-if cid != "X":
-    print("OK category found!:", cid)
-else:
-    print("**CATEGORY NOT FOUND TRY AGAIN**")
-    cid = getCategory(category)
+    geolocator = GoogleV3(api_key = 'AIzaSyCahybZqELJlJAWmQ3p-dTRBlNtuLfHr34')
+    address = geolocator.reverse(ll)
+    
+    address = address[0]
+    
+    print("REVERSAL The address of ", ll, "is:")
+    print address[0]
+    
+    return address
     
 
 
-# In[ ]:
+# In[48]:
 
 
 ## main()
 
+#category = raw_input('Enter a valid business category in mystore411.com: ') ## not used to validate anything
+#print("category is " + category)
+
+#storeName = raw_input('Enter a valid store Name in mystore411.com: ')
+#print('storeName is '+  storeName)
+
+#url = "https://mystore411.com"
+
+#store = urllib2.urlopen(url,context = context) ## first url with category
+#print("url for top biz is", url)
+#from bs4 import BeautifulSoup
+#soup = BeautifulSoup(store)
+
+cid = "X"
+while cid == "X":
+    category = raw_input('WHILE Enter a valid business category in mystore411.com: ') ## not used to validate anything
+    print("category is " + category)
+    cid = getCategory(category)
+    if cid != "X":
+        print("OK category found!:", cid)
+    
+
+
+# In[49]:
+
+
+
 print("category is " + category)
 
-url = "https://mystore411.com/store/category/" + category ## need to automate!
+url = "https://mystore411.com/store/category/" + category 
 
-print('storeName is '+  storeName)
+
 
 # here reads the top biz url!
-store = urllib2.urlopen(url,context = context)
+#store = urllib2.urlopen(url,context = context)
 #import the Beautiful soup functions to parse the data returned from the website
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 #Parse the html in the 'store' variable, and store it in Beautiful Soup format
-soup = BeautifulSoup(store)
+#soup = BeautifulSoup(store)
 
-sid = getStoreID(storeName)
-if sid == "XXX":
-    print("ERROR NO ID FOR ", storeName, " has been found")
-    print(" -- PROGRAM TERMINATED! --")
-    exit()
-else:
-    #specify the url
-    url = str('http://www.mystore411.com/store/listing/' + sid + '/Canada/' + storeName + '-store-locations')
-    print(url)
+sid = "XXX"
+while sid == "XXX":
+    storeName = raw_input('Enter a valid store Name in mystore411.com: ')
+    print('storeName is '+  storeName)
+    sid = getStoreID(storeName)
+    if sid != "XXX":
+        print("StoreID for ", storeName, " has been found")
+        #specify the url
+        url = str('http://www.mystore411.com/store/listing/' + sid + '/Canada/' + storeName + '-store-locations')
+        print(url)
 
-    ## initializations to get the geolocation of the address of the storeName
-    geo_s = 'https://maps.googleapis.com/maps/api/geocode/json'
+        ## initializations to get the geolocation of the address of the storeName
+        geo_s = 'https://maps.googleapis.com/maps/api/geocode/json'
 
 
 
-# In[ ]:
+# In[50]:
 
 
 ## Itererate over the storeName url and compose the address
@@ -238,7 +269,14 @@ for a in soup.find_all('a',href=True):
     ## conforming address
     add = getAddress(storeURL)
     print(add)
-    ll = getGeoloc(add).encode('ascii', 'ignore') ## 5625 Boul. M\xe9tropolitain St-L\xe9onard Quebec H1P 1X3  
+    ##ll = getGeoloc(add).encode('ascii', 'ignore') ## 5625 Boul. M\xe9tropolitain St-L\xe9onard Quebec H1P 1X3  This may not be working
+    ll = getGeoloc(add)
     print("lat and long are:", ll)
+    
+    ## also, given a lat and lng we can extract the address
+    
+    add = getAddfromLL(ll)
+    
+    ## print("Address for ", ll, " is ", add)
     
 
