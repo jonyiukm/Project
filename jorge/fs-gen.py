@@ -1,3 +1,4 @@
+
 # coding: utf-8
 
 # Program: fscraper-mystore411.py
@@ -21,7 +22,7 @@
 # This version is just to estimate the volume of the output!! also to generates the data in CSVs to upload to the db
 # 
 
-# In[ ]:
+# In[19]:
 
 
 # initializations
@@ -39,7 +40,7 @@ import re
 from bs4 import BeautifulSoup
 
 
-# In[ ]:
+# In[20]:
 
 
 from googleplaces import GooglePlaces, types, lang
@@ -49,7 +50,7 @@ MY_API_KEY = 'AIzaSyBCStYlYkMxdXJYJjuVEINvU7U8HBarCJ0' ## THIS IS MY OWN KEY
 google_places = GooglePlaces(MY_API_KEY)
 
 
-# In[ ]:
+# In[21]:
 
 
 ## Global variables for output
@@ -67,7 +68,7 @@ OutTyp  = " "
 countw = 0
 
 
-# In[ ]:
+# In[22]:
 
 
 ## these two lines to avoid the SSL error
@@ -75,7 +76,7 @@ import ssl
 context = context = ssl._create_unverified_context()
 
 
-# In[ ]:
+# In[23]:
 
 
 def getCategories(lCat):
@@ -122,7 +123,7 @@ def getCategories(lCat):
     return lCat, id, cid
 
 
-# In[ ]:
+# In[24]:
 
 
 ## New getbiz
@@ -187,7 +188,7 @@ def getBizNew(url):
                 
                         lBiz.append(url)
                     
-                        print "&&&&& WTH lBiz is", lBiz
+                        ## print "&&&&& WTH lBiz is", lBiz
                     
                         start = url.find('store/listing/') + 14 ## BIZ_ID
                         end = url.find('/Canada/', start)
@@ -201,7 +202,7 @@ def getBizNew(url):
             
                         print "#### bizDesc=", bizDesc
             
-                        print "###################### WRITE RECORD ############################"
+                        print "###################### WRITE RECORD BZC #########################"
                         iibizID  = "%05d" % (int(bizID))
                         with open('BZC.csv', 'a') as csvfile:
                             fieldnames = ['BIZ_ID', 'BIZ_DESC', 'CAT_ID']
@@ -210,7 +211,7 @@ def getBizNew(url):
                             writer.writerow({'BIZ_ID': iibizID, 'BIZ_DESC': bizDesc, 'CAT_ID':cid})  
                             #####################################################################
                         
-                        print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& This is lBiz inside getNewBiz:", lBiz
+                        ## print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& This is lBiz inside getNewBiz:", lBiz
 
     return lBiz
                     
@@ -218,7 +219,7 @@ def getBizNew(url):
         
 
 
-# In[ ]:
+# In[25]:
 
 
 def getCities(url):
@@ -257,7 +258,7 @@ def getCities(url):
     return lCity
 
 
-# In[22]:
+# In[26]:
 
 
 def getAddress(storeURL):
@@ -304,10 +305,10 @@ def getAddress(storeURL):
     OutProv = reg
     OutPost = pos
     
-    return add, loc, reg, pos
+    return add, address, loc, reg, pos
 
 
-# In[ ]:
+# In[27]:
 
 
 def getGeoloc(add):
@@ -332,7 +333,7 @@ def getGeoloc(add):
     return str(lat), str(lng)
 
 
-# In[ ]:
+# In[28]:
 
 
 def unlistTypes(types):
@@ -349,7 +350,7 @@ def unlistTypes(types):
         
 
 
-# In[ ]:
+# In[29]:
 
 
 def getStates(url):
@@ -391,10 +392,10 @@ def getStates(url):
     return lStates
 
 
-# In[19]:
+# In[30]:
 
 
-## TEST ## THIS IS THE NEW FUNCTION THAT WORKS!!! OK
+
 def TGetLocation(url):
     print("at TGetLocation with url:", url)    
     ##time.sleep(2) ####################### added to hopefully avoid program stops abruptly
@@ -437,17 +438,16 @@ def TGetLocation(url):
                 storeURL = ('https://mystore411.com' + a['href']).encode('utf-8') ## Here I conform the URL for reading the store name of the biz
                 print("at TGetLocation ====== storeURL is:", storeURL, "a[href] is:", a['href'])
                 
-                add, OutCity, OutProv, OutPost = getAddress(storeURL)
+                add, OutAdd, OutCity, OutProv, OutPost = getAddress(storeURL)
                 
-                print("*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&**&*&*&* OutProv=", Outprov)
+                print("*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&**&*&*&* OutProv=", OutProv)
                 
-                print("The address of the biz with is:", add)
+                print("The address of the biz is:", OutAdd + " " + OutCity + " " + OutProv + " " + OutPost)
             
                 ##ll = getGeoloc(add).encode('ascii', 'ignore') ## 5625 Boul. M\xe9tropolitain St-L\xe9onard Quebec H1P 1X3  This may not be working
-                ## dummy lat, lng = getGeoloc(add)
                 
-                lat = 99.99
-                lng = 77.77
+                lat, lng = getGeoloc(add) ## Query Google API
+                
                 
                 print("lat and long are:", lat, " ", lng)
                 
@@ -455,106 +455,142 @@ def TGetLocation(url):
                 OutLng = lng
                 
                 ##pos = "pos"
-                             
-                OutName = "OutName"
-                OutRtg = "5.0" ## needs to be str                  
-                   
-                OutTyp = "a, b, c, d"  ## needs to be str              
                 
-                ## here I include the code to gather the columns we need to conform our table
-                              
-                print("===============================")
-                print "Name=", OutName 
-                print "add=",  OutAdd
-                print "City=", OutCity 
-                print "Prov=", OutProv 
-                print "Post=", OutPost 
-                print "Lat=",  OutLat 
-                print "Lng=",  OutLng  
-                print "Rtg=",  OutRtg  
-                print "Typ=",  OutTyp 
-                print("===============================")
-                
-                ## STORE_ID
+                ## Store ID
                 start = storeURL.find('/view/') + 6
                 end = storeURL.find('/Canada/')
                 OutSid = storeURL[start:end]
+                ## here you need to extract the bizname
                 
-                ## STORE_NAME_WEB
-                start = storeURL.find('/Canada/') + 8
+                OutName = "OutName"
+                ############ QUERY 2 Google API
                 
-                OutSnw = storeURL[start:]   
+                start = url.find("Canada/") + 7
+                end = url.find('-store', start) ## needs to be between Canada/ and -store!!
+                bizN = url[start:end]
                 
-                ## STORE_NAME_API
-                ## need to query API
-                OutSnw = "GOOGLE API"
+                try:
+                    query_result = google_places.nearby_search(lat_lng = {'lat': lat, 'lng': lng}, name = bizN) ## Need to get the store name!
+                    print "AFTER parameters for calling google_places are lat, lng, pos =", lat, lng, bizN 
+                    time.sleep(5) ## think a delay is necessary otherwise may crash!! ###########################################
                 
-                ##BIZ_ID
-                ## here I need to sequentially read BZC.csv and find the BIZ_ID
-                OutBid = 12345 ## str??
-                                
-                ##PROV_ID
-                ## here need to retrieve the PROV_ID from PRV.csv
-                OutProv = 12345
+                    place_id = query_result.places[0].place_id ## gets the place id 
+                    print "place_id=", place_id 
                 
-                ##CITY_ID
-                ## here need to retrieve the CITY_ID from CIT.csv
-                OutCit = 12345
+                    ## gets rating given a place_id
+
+                    store = google_places.get_place(place_id) ## gets the rating given the place id
+
+                    print("Store rating of", str(store.name), "is=", store.rating)
+                    ##time.sleep(2) ## think a delay is necessary otherwise may crash!! ###########################################
                 
-                ## rest of fields already recovered
+                    ## conform table (within scope of if for testing)
                 
-                with open('SL.csv', 'a') as csvfile:
-                    fieldnames = ['STORE_ID', 'STORE_NAME_WEB', 'STORE_NAME_API', 
-                                  'BIZ_ID', 'PROV_ID', 'CITY_ID', 'ADDRESS', 
-                                  'POSTAL_CODE', "LATITUDE", "LONGITUDE", 
-                                  'RATING', 'TYPES']
-                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                    ##########################################################################################
-                    writer.writerow({'STORE_ID': OutSid, 'STORE_NAME_WEB': OutSnw,"STORE_NAME_API": OutSna, 
-                                     'BIZ_ID': OutBid, "PROV_ID": OutProv, 'CITY_ID':OutCit, 'ADDRESS':OutAdd,
-                                     "POSTAL_CODE": OutPost, "LATITUDE": OutLat,"LONGITUDE": OutLng, 
-                                     "RATING": OutRtg, "TYPES": OutTyp})
-                    ##########################################################################################    
-                
-                    ##countw+=1
-                    ##print("Im writing #", countw)              
-                
-                
-                with open('OUTPUT.csv', 'a') as csvfile:
-                    fieldnames = ['Name', 'Address', "City", "Province", 
-                                  "Postal Code", "Latitude", "Longitude", 
-                                  "Rating", "Types"]
-                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                    ##################################################################################
-                    writer.writerow({'Name': OutName, 'Address': OutAdd, "City": OutCity, 
-                                     "Province": OutProv, "Postal Code": OutPost, "Latitude": OutLat, 
-                                     "Longitude": OutLng, "Rating": OutRtg, "Types": OutTyp})
-                    ##################################################################################    
-                
-                    countw+=1
-                    print("Im writing #", countw)
+                    OutBN = str(store.name) 
+                    OutRtg = str(store.rating) ## needs to be str
+                    
                  
+                    OutTyp = unlistTypes(store.types)  ## needs to be str  
+
+                ############ END Google Query
+                                
+                    ## here I include the code to gather the columns we need to conform our table
+                              
+                    print("===============================")
+                    print "Name=", OutName 
+                    print "add=",  OutAdd
+                    print "City=", OutCity 
+                    print "Prov=", OutProv 
+                    print "Post=", OutPost 
+                    print "Lat=",  OutLat 
+                    print "Lng=",  OutLng  
+                    print "Rtg=",  OutRtg  
+                    print "Typ=",  OutTyp 
+                    print("===============================")
                 
+                    ## STORE_ID
+                    start = storeURL.find('/view/') + 6
+                    end = storeURL.find('/Canada/')
+                    OutSid = storeURL[start:end]
+                
+                    ## STORE_NAME
+                    start = storeURL.find('/Canada/') + 8
+                
+                    OutSna = storeURL[start:]   
+                
+                    ## STORE_NAME_API
+                    ## need to query API
+                    OutSnw = "GOOGLE API"
+                
+                    ##BIZ_ID
+                    ## here I need to sequentially read BZC.csv and find the BIZ_ID
+                    OutBid = 12345 ## str??
+                                
+                    ##PROV_ID
+                
+                    ##CITY_ID     
+                
+                    ## rest of fields already recovered
+                
+                    with open('SL.csv', 'a') as csvfile:
+                        fieldnames = ['STORE_ID', 'STORE_NAME_WEB', 'STORE_NAME_API', 
+                                      'BIZ_ID', 'PROV_ID', 'CITY_ID', 'ADDRESS', 
+                                      'POSTAL_CODE', "LATITUDE", "LONGITUDE", 
+                                      'RATING', 'TYPES']
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                        ##########################################################################################
+                        writer.writerow({'STORE_ID': OutSid, 'STORE_NAME_WEB': OutSnw,"STORE_NAME_API": OutSna, 
+                                         'BIZ_ID': OutBid, "PROV_ID": OutProv, 'CITY_ID':OutCity, 'ADDRESS':OutAdd,
+                                         "POSTAL_CODE": OutPost, "LATITUDE": OutLat,"LONGITUDE": OutLng, 
+                                         "RATING": OutRtg, "TYPES": OutTyp})
+                        ##########################################################################################    
+                
+                        ##countw+=1
+                        ##print("Im writing #", countw)              
+                
+                
+                    with open('SAMPLE.csv', 'a') as csvfile:
+                        fieldnames = ['Store_id', 'Store_Name', 'Biz_Name', 'Address', "City", 
+                                      'Province', 'Postal Code','Latitude', 'Longitude', 'Rating', 'Types']
+
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                        ##################################################################################
+                        writer.writerow({'Store_id': OutSid, 'Store_Name':OutSna, 'Biz_Name': OutBN, 
+                                         'Address': OutAdd, 'City': OutCity, 'Province': OutProv, 
+                                         'Postal Code': OutPost, 'Latitude': OutLat, 'Longitude': OutLng, 
+                                         'Rating': OutRtg, 'Types': OutTyp})
+                        ##################################################################################    
+                        print("Im writing #", countw)
+                        countw+=1
+                    
+                        if countw >= 1000:
+                            ## set to 10 just for testing!!
+                            print("*********  EXECUTION OF PROGRAM TERMINATED ***********")
+                            return 
+                except:
+                    print "********* ERROR when trying to get the place_id Google API didn't like it! **********"                   
     return
 
 
-# In[17]:
+# In[31]:
 
 
 def writeOutputfh():
-    if os.path.exists("./OUTPUT.csv"):
-        os.remove("./OUTPUT.csv")
-        print "*** OUTPUT file DELETED ***"
+    OUT = "./SAMPLE.csv"
+    if os.path.exists(OUT):
+        os.remove(OUT)
+        print "***", OUT, " file DELETED ***"
     else:
-        print("The file OUTPUT does not exist")
+        print("The file", OUT, " does not exist")
 
-    with open('OUTPUT.csv', 'a') as csvfile:
-        fieldnames = ['Name', 'Address', "City", "Province", "Postal Code", "Latitude", "Longitude", "Rating", "Types"]
+    with open(OUT, 'a') as csvfile:
+        fieldnames = ['Store_id', 'Store_Name', 'Biz_Name', 'Address', "City", 
+                      'Province', 'Postal Code','Latitude', 'Longitude', 'Rating', 'Types']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
 
-# In[ ]:
+# In[32]:
 
 
 def writeCidfh():
@@ -563,7 +599,7 @@ def writeCidfh():
         os.remove(CID)
         print "*** ", CID, " file DELETED ***"
     else:
-        print("The file CID does not exist")
+        print("The file ", CID, " does not exist")
 
     with open(CID, 'a') as csvfile:
         fieldnames = ['CAT_ID', 'CAT_DESC']
@@ -571,7 +607,7 @@ def writeCidfh():
         writer.writeheader()
 
 
-# In[ ]:
+# In[33]:
 
 
 def writeBizCfh():
@@ -588,7 +624,7 @@ def writeBizCfh():
         writer.writeheader()   
 
 
-# In[3]:
+# In[34]:
 
 
 def writeStoLfh():
@@ -604,23 +640,6 @@ def writeStoLfh():
                       'STORE_NAME_API', 'BIZ_ID', 'PROV_ID', 
                       'CITY_ID', 'ADDRESS', 'POSTAL_CODE', 
                       "LATITUDE", "LONGITUDE", 'RATING', 'TYPES']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()   
-
-
-# In[5]:
-
-
-## TEST
-def writeStoLfh():
-    SL = "./SL.csv"
-
-    with open(SL, 'a') as csvfile:
-        fieldnames = ['STORE_ID', 'STORE_NAME_WEB', 
-                      'STORE_NAME_API', 'BIZ_ID', 
-                      'PROV_ID', 'CITY_ID', 'ADDRESS', 
-                      'POSTAL_CODE', "LATITUDE", "LONGITUDE", 
-                      'RATING', 'TYPES']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()   
 
@@ -709,21 +728,21 @@ for i in range(0, len(lCat)):
     lABiz += lBiz
 
 
-print("&&&&&&&&&&&&&& This is the list of ALL Businesses in each category:", lABiz)
+##print("&&&&&&&&&&&&&& This is the list of ALL Businesses in each category:", lABiz)
 
 
 print(" =============================== in getStates =======================================")
 
-for i in range(0, len(lABiz)):
+for i in range(0, len(lABiz)): 
+    print("Main ############# i=", i, "len(lABiz):", len(lABiz))
     lSta = getStates(lABiz[i])
     lASta += lSta
 ##print("&&&&&&&&&&&&&& This is the list of ALL States in each business:", lASta)
 
 ## writing lASta into a file for debugging purposes!!!!
-f = open("./lASta", "w")
+f = open("./lASta2", "w")
 for i in range(0,len(lASta)):
     f.write(lASta[i]+",")
-### not here!!! f.close()
 
 writeStoLfh()
 #############
@@ -734,7 +753,7 @@ for i in range(0, len(lASta)):
     TGetLocation(lASta[i])
 
 ##print "#### writing lACit into a file for debugging purposes!!!!"
-f = open("./lACit", "w")
+f = open("./lACit2", "w")
 for i in range(0,len(lACit)):
     f.write(lACit[i]+",")
 
@@ -743,7 +762,7 @@ for i in range(0,len(lACit)):
 ###print(len(lACit))
 
 i=0
-print("@@@@@ lACit len is", len(lACit))
+## print("@@@@@ lACit len is", len(lACit))
 for i in range(0, len(lACit)): ## Here retrieve all stores that are present in cities
 ###for i in range(0, len(lACit)): ## TEST from 100 to 1000 occurrence, changed back from 0!
 ###    print("@@@@ I AM PROCESSING i=", i, "lACit=", lACit[i])
