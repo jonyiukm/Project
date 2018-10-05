@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # Program: fscraper-mystore411.py
@@ -22,7 +21,7 @@
 # This version is just to estimate the volume of the output!! also to generates the data in CSVs to upload to the db
 # 
 
-# In[19]:
+# In[ ]:
 
 
 # initializations
@@ -40,7 +39,7 @@ import re
 from bs4 import BeautifulSoup
 
 
-# In[20]:
+# In[ ]:
 
 
 from googleplaces import GooglePlaces, types, lang
@@ -50,12 +49,12 @@ MY_API_KEY = 'AIzaSyBCStYlYkMxdXJYJjuVEINvU7U8HBarCJ0' ## THIS IS MY OWN KEY
 google_places = GooglePlaces(MY_API_KEY)
 
 
-# In[21]:
+# In[ ]:
 
 
 ## Global variables for output
 
-OutName = " "
+OutBN = " "
 OutAdd  = " "
 OutCity = " "
 OutProv = " "
@@ -68,7 +67,7 @@ OutTyp  = " "
 countw = 0
 
 
-# In[22]:
+# In[ ]:
 
 
 ## these two lines to avoid the SSL error
@@ -76,7 +75,7 @@ import ssl
 context = context = ssl._create_unverified_context()
 
 
-# In[23]:
+# In[ ]:
 
 
 def getCategories(lCat):
@@ -123,7 +122,7 @@ def getCategories(lCat):
     return lCat, id, cid
 
 
-# In[24]:
+# In[ ]:
 
 
 ## New getbiz
@@ -219,7 +218,7 @@ def getBizNew(url):
         
 
 
-# In[25]:
+# In[ ]:
 
 
 def getCities(url):
@@ -258,7 +257,7 @@ def getCities(url):
     return lCity
 
 
-# In[26]:
+# In[ ]:
 
 
 def getAddress(storeURL):
@@ -308,32 +307,28 @@ def getAddress(storeURL):
     return add, address, loc, reg, pos
 
 
-# In[27]:
+# In[ ]:
 
 
 def getGeoloc(add):
     ##
     ## get coordinates of address
-    
+    time.sleep(2)
     param = {'address': add, 'key': 'AIzaSyBCStYlYkMxdXJYJjuVEINvU7U8HBarCJ0'} ## here used Google API
     geo_s = 'https://maps.googleapis.com/maps/api/geocode/json' ## needed
     
-    response = requests.get(geo_s, params=param)
-
-    json_dict = response.json()
-
-    ## testing
-    lat = json_dict['results'][0]['geometry']['location']['lat']
-    lng = json_dict['results'][0]['geometry']['location']['lng']
-    
-    ##ll = str(lat) + "," + str(lng)
-    
-    time.sleep(2) 
-    
+    try:
+        response = requests.get(geo_s, params=param)
+        json_dict = response.json()
+        lat = json_dict['results'][0]['geometry']['location']['lat']
+        lng = json_dict['results'][0]['geometry']['location']['lng']      
+    except:
+        print "*** ERROR at getGeoloc, unable to retrieve lat and lng ***"
+      
     return str(lat), str(lng)
 
 
-# In[28]:
+# In[ ]:
 
 
 def unlistTypes(types):
@@ -350,7 +345,7 @@ def unlistTypes(types):
         
 
 
-# In[29]:
+# In[ ]:
 
 
 def getStates(url):
@@ -392,7 +387,7 @@ def getStates(url):
     return lStates
 
 
-# In[30]:
+# In[ ]:
 
 
 
@@ -400,7 +395,7 @@ def TGetLocation(url):
     print("at TGetLocation with url:", url)    
     ##time.sleep(2) ####################### added to hopefully avoid program stops abruptly
     
-    OutName = " "
+    OutBN = " "
     OutAdd  = " "
     OutCity = " "
     OutProv = " "
@@ -462,9 +457,6 @@ def TGetLocation(url):
                 OutSid = storeURL[start:end]
                 ## here you need to extract the bizname
                 
-                OutName = "OutName"
-                ############ QUERY 2 Google API
-                
                 start = url.find("Canada/") + 7
                 end = url.find('-store', start) ## needs to be between Canada/ and -store!!
                 bizN = url[start:end]
@@ -497,7 +489,7 @@ def TGetLocation(url):
                     ## here I include the code to gather the columns we need to conform our table
                               
                     print("===============================")
-                    print "Name=", OutName 
+                    print "Name=", OutBN 
                     print "add=",  OutAdd
                     print "City=", OutCity 
                     print "Prov=", OutProv 
@@ -565,14 +557,16 @@ def TGetLocation(url):
                     
                         if countw >= 1000:
                             ## set to 10 just for testing!!
-                            print("*********  EXECUTION OF PROGRAM TERMINATED ***********")
-                            return 
+                            print("*********  EXECUTION OF PROGRAM TERMINATED **** countw =", countw)
+                            exit()
+                            print("********* AFTER EXIT() *******")
+                            ## return 
                 except:
                     print "********* ERROR when trying to get the place_id Google API didn't like it! **********"                   
     return
 
 
-# In[31]:
+# In[ ]:
 
 
 def writeOutputfh():
@@ -590,7 +584,7 @@ def writeOutputfh():
         writer.writeheader()
 
 
-# In[32]:
+# In[ ]:
 
 
 def writeCidfh():
@@ -607,7 +601,7 @@ def writeCidfh():
         writer.writeheader()
 
 
-# In[33]:
+# In[ ]:
 
 
 def writeBizCfh():
@@ -624,7 +618,7 @@ def writeBizCfh():
         writer.writeheader()   
 
 
-# In[34]:
+# In[ ]:
 
 
 def writeStoLfh():
