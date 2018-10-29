@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # Exploring Environment Canada Weather Data
@@ -81,7 +80,7 @@ def calcPostalC(lat, lng, flagPC):
 # In[3]:
 
 
-def getMonthlyData(stationID, year, month, prov, name, flagPC):
+def getHourlyData(stationID, year, month, prov, name, flagPC):
     print("at ############### getMonthlyData with", year, month, prov, name, flagPC)
     global val
     
@@ -163,80 +162,74 @@ def getMonthlyData(stationID, year, month, prov, name, flagPC):
 
     
     #print("################ out of for to build lst ######################")
+    try:
+        df = pd.DataFrame(lst, columns= oCols) ## 24 columns converted!!   
     
-    df = pd.DataFrame(lst, columns= oCols) ## 24 columns converted!!   
+        ## Filterout by year
     
-    ## Filterout by year
-    
-    ## before df = df[df['Year'] >= year] 
-    df = df[df['Year'] >= df['Year'].max()]
-    ##################################
-    
-    df['StationID'] = stationID
-    df['Province'] = prov
-    df['Name'] = name
-    df['Latitude']= lat
-    df['Longitude']= lng
-    
-    df['Postal Code']= calcPostalC(lat, lng, flagPC)
-    
-    ## Rearrange columns
-    
-    ## rearranging columns
-    df = df[[
-             'Province',    #new 1
-             'StationID',   #new 2 
-             'Name',        #new 3 
-             'Latitude',    #new 4
-             'Longitude',   #new 5 
-             'Postal Code', #new 6
-                "Date/Time",
-                "Year",
-                "Month",
-                "Day",
-                "Time", #5
-                "Temp (°C)",
-                "Temp Flag",
-                "Dew Point Temp (°C)",
-                "Dew Point Temp Flag",
-                "Rel Hum (%)", #10
-                "Rel Hum Flag",
-                "Wind Dir (10s deg)",
-                "Wind Dir Flag",
-                "Wind Spd (km/h)",
-                "Wind Spd Flag", #15
-                "Visibility (km)",
-                "Visibility Flag",
-                "Stn Press (kPa)",
-                "Stn Press Flag",
-                "Hmdx", #20
-                "Hmdx Flag",
-                "Wind Chill",
-                "Wind Chill Flag",
-                "Weather"
-            ]]
+        ## before df = df[df['Year'] >= year] 
+        df = df[df['Year'] >= df['Year'].max()]
+        ##################################
 
-    with open('fHourlyEC.csv', 'a') as f:
-        df.to_csv(f, header=val, index = False) ## just for testing changed!!
-        print("###### header=", val)
-    val = False
-    flagPC = False; print("at getMontlhyData flagPC=", flagPC)
+        df['StationID'] = stationID
+        df['Province'] = prov
+        df['Name'] = name
+        df['Latitude']= lat
+        df['Longitude']= lng
+
+        df['Postal Code']= calcPostalC(lat, lng, flagPC)
+
+        ## Rearrange columns
+
+        ## rearranging columns
+        df = df[[
+                 'Province',    #new 1
+                 'StationID',   #new 2 
+                 'Name',        #new 3 
+                 'Latitude',    #new 4
+                 'Longitude',   #new 5 
+                 'Postal Code', #new 6
+                    "Date/Time",
+                    "Year",
+                    "Month",
+                    "Day",
+                    "Time", #5
+                    "Temp (°C)",
+                    "Temp Flag",
+                    "Dew Point Temp (°C)",
+                    "Dew Point Temp Flag",
+                    "Rel Hum (%)", #10
+                    "Rel Hum Flag",
+                    "Wind Dir (10s deg)",
+                    "Wind Dir Flag",
+                    "Wind Spd (km/h)",
+                    "Wind Spd Flag", #15
+                    "Visibility (km)",
+                    "Visibility Flag",
+                    "Stn Press (kPa)",
+                    "Stn Press Flag",
+                    "Hmdx", #20
+                    "Hmdx Flag",
+                    "Wind Chill",
+                    "Wind Chill Flag",
+                    "Weather"
+                ]]
+
+        with open('fHourlyEC.csv', 'a') as f:
+            df.to_csv(f, header=val, index = False) ## just for testing changed!!
+            print("###### header=", val)
+        val = False
+        flagPC = False; print("at getMontlhyData flagPC=", flagPC)
+    except:
+        print("++++++++++++++ ERROR in converting data into dataframe ++++++++++++++++++++")
+        pass
+            
     return df, flagPC
-
-
-# In[4]:
-
-
-
-#TEST
-g=geocoder.google([45.53, -78.27], method='reverse')
-g.postal
-print(g.postal)
 
 
 # function that takes in a station ID, the year and month and returns a pandas DataFrame with the downloaded data:
 
-# In[5]:
+# In[4]:
 
 
 def fSoupFrames(province, start_year, max_pages):
@@ -268,9 +261,10 @@ def fSoupFrames(province, start_year, max_pages):
     
 
 
-# In[6]:
+# In[5]:
 
 
+#Example:
 #sd='Sep2016'
 #ed='Sep2017'
 
@@ -286,43 +280,15 @@ def lookUpStation(stationID, sd, ed, prov, name):
     flagPC = True  ; print("at lookUpStation flagPC=", flagPC)
     for dt in rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date):
     
-        df, flagPC = getMonthlyData(stationID, dt.year, dt.month, prov, name, flagPC) 
+        df, flagPC = getHourlyData(stationID, dt.year, dt.month, prov, name, flagPC) 
     
         print("################# dt.year=", dt.year, "dt.month=", dt.month)
     return df
 
 
-# In[ ]:
-
-
-##TEST
-stationID="31688"
-prov = "ON"
-name = "TEST STATION"
-
-sd = "Sep2017"
-ed = "Sep2018"
-
-print("****** at lookUpStation StationID=", stationID, " prov=", prov, "name=", name, "sd=", sd, "ed=", ed)
-    
-start_date = datetime.strptime(sd, '%b%Y')
-end_date = datetime.strptime(ed, '%b%Y')
-
-   
-    ## here appends all WS of the province
-flagPC = True  ; print("at lookUpStation flagPC=", flagPC)
-    
-for dt in rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date):
-    #df, flagPC = getMonthlyData(stationID, dt.year, dt.month, prov, name, flagPC) 
-        
-    print("getMonthlyData with parms=", stationID, dt.year, dt.month, prov, name, flagPC)
-    
-    #print("################# dt.year=", dt.year, "dt.month=", dt.month)
-
-
 # ################################################### main() #############################################################
 
-# In[7]:
+# In[6]:
 
 
 # Store each page in a list and parse them later
@@ -330,7 +296,7 @@ soup_frames = []
 stations_df = [] 
 
 
-# In[8]:
+# In[7]:
 
 
 # need to iterate over all provinces of Canada!
@@ -365,7 +331,7 @@ for key, value in dProv.items():
 
 # Here loops to each station, gets the stationID, data intervals available for start and end years
 
-# In[9]:
+# In[8]:
 
 
 # include
@@ -412,7 +378,7 @@ stations_df.to_csv('stations.csv')
 stations_df.head()
 
 
-# In[10]:
+# In[9]:
 
 
 ## changed from hourly to Monthly Data!!
@@ -425,7 +391,7 @@ hourly_stations.to_csv('h_stations.csv') ## saving stations data with hourly dat
 hourly_stations.head()
 
 
-# In[11]:
+# In[10]:
 
 
 ## Here iterate over all monthly stations in all provinces
@@ -446,4 +412,3 @@ for index, row in hourly_stations.iterrows():
     ## here is not! print (row['Postal Code'])
     allStations = lookUpStation(row["StationID"], 'Jan2017', 'Dec2018', 
                                 row["Province"], row["Name"]) 
-
