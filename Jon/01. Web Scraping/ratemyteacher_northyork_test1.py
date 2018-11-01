@@ -18,14 +18,18 @@ soup.prettify()
 #USE DIR(var_name) TO CHECK FUNCTIONS AVAILABLE FOR THAT VARIABLE TYPE
 
 #school name is stored under h3 tag
-name_tag = soup.find('h3',attrs={'class': 'school_name'})
+name_tag_all = soup.findAll('h3',attrs={'class': 'school_name'})
 
-#THis includes the chunk of h3 tag as well as the text value we are looking for
-print(name_tag)
+#THis includes the chunk of h3 tags as well as the text value we are looking for
+print(name_tag_all)
 
-#remove all the tags within name_tag
-name_AY = name_tag.text.strip()
+#remove all the tags within name_tag - .text.strip() doesn't work with bulk tags
+#name_AY = name_tag.text.strip()
+#convert the result to str, then use BeautifulSoup's get_text() to remove tags all at once
+str_school_name = str(name_tag_all)
+clean_school_name = BeautifulSoup(str_school_name, "lxml").get_text()
 
-print(name_AY)
+print(clean_school_name)
 
 #next step get all the ratings
+#then combine into df(?)
