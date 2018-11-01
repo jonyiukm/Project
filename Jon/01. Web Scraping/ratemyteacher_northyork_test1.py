@@ -20,8 +20,10 @@ soup.prettify()
 #school name is stored under h3 tag
 name_tag = soup.find('h3',attrs={'class': 'school_name'})
 
+#THis includes the chunk of h3 tag as well as the text value we are looking for
 print(name_tag)
 
+#remove all the tags within name_tag
 name_AY = name_tag.text.strip()
 
 print(name_AY)
