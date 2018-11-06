@@ -108,7 +108,36 @@ clean_ratings_all
 
 type(clean_ratings_all)
 
+##############################
+#   STEP 4 - TOTAL RATINGS   #
+##############################
 
+ratings_count_all = soup.findAll('div',{'class': 'rating_count'})
+
+print(ratings_count_all)
+
+str_ratings_count = str(ratings_count_all)
+
+ratings_count = BeautifulSoup(str_ratings_count, "lxml").get_text()
+
+ratings_count
+
+clean_ratings_count=re.sub('\'|\\n|\[|\]','',ratings_count)
+
+clean_ratings_count_1 = clean_ratings_count.replace('ratings','')
+
+clean_ratings_count_final = clean_ratings_count_1.replace('rating','')
+
+print(clean_ratings_count_final)
+
+type(clean_ratings_count_final)
+
+#split the comma delimited string to list
+clean_ratings_count_list = clean_ratings_count_final.split(", ")
+
+print(clean_ratings_count_list)
+
+type(clean_ratings_count_list)
 
 #str_ratings_1 = str(ratings_tag_all_1)
 
