@@ -298,3 +298,7 @@ test_df.to_csv("north_york_df.csv",encoding='utf-8', index=False)
 ##############################################################################################
 #   STEP 9 - CONVERT STEP 8 INTO FUNCTION THAT CAN BE CALLED WHEN SCRAPING MULTIPLE CITIES   #
 ##############################################################################################
+
+##########################################################################################
+#   STEP 10 - Setup time interval for scraping the data to prevent crashing the server   #
+##########################################################################################
