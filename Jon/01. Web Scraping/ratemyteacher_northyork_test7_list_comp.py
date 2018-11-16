@@ -318,8 +318,7 @@ base_url = 'https://ca.ratemyteachers.com/ontario/north-york/'
 r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
 c0 = urlopen(r0).read()
 soup0 = BeautifulSoup(c0,'lxml')
-paging = soup0.find('li', attrs={'class':'last_page'})    
-last_pg=paging.a['href'][-1]
+last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
 
 #Empty lists to store the information we need
 #Ratings and Counts need manipulations after the for loop since there are items sharing the same tag but need to be excluded
@@ -328,7 +327,6 @@ institution = []
 ratings = []
 count = []
 web_content_list=[]
-
 
 #loop through pages
 for page_number in range(1,int(last_pg)+1):
