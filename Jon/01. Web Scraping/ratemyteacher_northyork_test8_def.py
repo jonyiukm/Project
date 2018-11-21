@@ -400,13 +400,11 @@ def test( province, city_name):
     prov = province.replace(' ','-')
   else:
     prov = province
-    #return prov;
 
   if ' ' in city_name:
     city = city_name.replace(' ','-')
   else:
     city = city_name
-    #return city;
   
   base_url="https://ca.ratemyteachers.com/" + str(prov) + "/" + str(city) + "/"
   r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
@@ -418,8 +416,8 @@ def test( province, city_name):
     last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
   else:
     last_pg='1'
-  #return last_pg;
   
+  #Create Empty Lists for results
   school = []
   institution = []
   ratings = []
@@ -440,18 +438,14 @@ def test( province, city_name):
     
     count = count + [x.text.strip().replace('\nratings','').replace('\nrating','') for x in soup.findAll('div',{'class': 'rating_count'})]
  
-
   return prov, city, base_url, last_pg, school, institution, ratings, count;
 
 #print(test("New Brunswick","Ste Anne De Madawaska"))
-
 #print(test("ontario","north York"))
-
 test1 = test("ontario","north york")
-
 test_school_list = test1[4]
-
 type(test_school_list)
+
 
 
 
