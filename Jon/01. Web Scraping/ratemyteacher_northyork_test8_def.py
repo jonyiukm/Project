@@ -372,7 +372,7 @@ def test( province, city_name):
     city = city_name.replace(' ','-')
     #return city;
   
-  base_url="https://ca.ratemyteachers.com/" + str(province) + "/" + str(city) + "/"
+  base_url="https://ca.ratemyteachers.com/" + str(prov) + "/" + str(city) + "/"
   r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
   c0 = urlopen(r0).read()
   soup0 = BeautifulSoup(c0,'lxml')
