@@ -394,34 +394,71 @@ print(test("New Brunswick","Ste Anne De Madawaska"))
 #create a test function to convert province and city with hyphens and get the last page
 #if only 1 page, the find('li') will be None
 #write an if clause to say is not None, and convert city_name and province to no space
-def scrape(province_1, city_name_1):
-    if ' ' in city_name_1 == True:
-        city_name=city_name_1.replace(' ','-')
-        #create website from city_name
-    else:
-        city_name=city_name_1
-        
-    if ' ' in province_1 == True:
-        province=province_1.replace(' ','-')
-    else:
-        province=province_1
-        
-    base_url = 'https://ca.ratemyteachers.com/' + str(province) + '/' + str(city_name) + '/'
-    r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
-    c0 = urlopen(r0).read()
-    soup0 = BeautifulSoup(c0,'lxml')
+#Seems to work
+def test( province, city_name):
+  if ' ' in province:
+    prov = province.replace(' ','-')
+  else:
+    prov = province
+    #return prov;
+
+  if ' ' in city_name:
+    city = city_name.replace(' ','-')
+  else:
+    city = city_name
+    #return city;
+  
+  base_url="https://ca.ratemyteachers.com/" + str(prov) + "/" + str(city) + "/"
+  r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
+  c0 = urlopen(r0).read()
+  soup0 = BeautifulSoup(c0,'lxml')
+
+  #check last page  
+  if soup0.find('li', attrs={'class':'last_page'}) is not None:
+    last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
+  else:
+    last_pg='1'
+  #return last_pg;
+  
+  school = []
+  institution = []
+  ratings = []
+  count = []
+  
+  for page_number in range(1,int(last_pg)+1):
+    url = base_url+str(page_number)
+    r = Request(base_url+str(page_number),headers={'User-Agent':'Mozilla/5.0'})
+    c = urlopen(r).read()
+    soup = BeautifulSoup(c,'lxml')
+ 
+    #.extend has to be in a separate line because the function extend is an in-place function, ie it will make the changes to the original list and return None
+    school = school + [x.a.text.strip() for x in soup.findAll('h3',class_= 'school_name')]
     
-    if soup0.find('li', attrs={'class':'last_page'}) is not None:
-        last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
-    else:
-        last_pg='1'
+    institution = institution + [x.text.strip() for x in soup.findAll('div',{'class': 'institution_type'})]
+        
+    ratings = ratings + [x["title"] for x in soup.findAll('div',{'class': 'rateit star-rating rateit-exclude'}) if x["title"]!=''][1:]
     
-    return city_name
+    count = count + [x.text.strip().replace('\nratings','').replace('\nrating','') for x in soup.findAll('div',{'class': 'rating_count'})]
+ 
 
-#create a function which takes city name as input
-scrape("New Brunswick","Ste Anne De Madawaska")
+  return prov, city, base_url, last_pg, school, institution, ratings, count;
+
+#print(test("New Brunswick","Ste Anne De Madawaska"))
+
+#print(test("ontario","north York"))
+
+test1 = test("ontario","north york")
+
+test_school_list = test1[4]
+
+type(test_school_list)
 
 
+
+
+
+
+################################################################################################################################
 rt = Request('https://ca.ratemyteachers.com/new-brunswick/ste-anne-de-madawaska', headers={'User-Agent':'Mozilla/5.0'})
 ct = urlopen(rt).read()
 soupt = BeautifulSoup(ct,'lxml')
