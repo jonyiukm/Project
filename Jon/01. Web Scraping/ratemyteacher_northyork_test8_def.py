@@ -363,6 +363,34 @@ from urllib.request import Request, urlopen
 import pandas
 import re
 
+def test( province, city_name):
+  if ' ' in province:
+    prov = province.replace(' ','-')
+    #return prov;
+
+  if ' ' in city_name:
+    city = city_name.replace(' ','-')
+    #return city;
+  
+  base_url="https://ca.ratemyteachers.com/" + str(province) + "/" + str(city) + "/"
+  r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
+  c0 = urlopen(r0).read()
+  soup0 = BeautifulSoup(c0,'lxml')
+
+  #check last page  
+  if soup0.find('li', attrs={'class':'last_page'}) is not None:
+    last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
+  else:
+    last_pg='1'
+  #return last_pg;
+
+  return prov, city, base_url, last_pg;
+
+
+
+print(test("New Brunswick","Ste Anne De Madawaska"))
+
+
 #create a test function to convert province and city with hyphens and get the last page
 #if only 1 page, the find('li') will be None
 #write an if clause to say is not None, and convert city_name and province to no space
