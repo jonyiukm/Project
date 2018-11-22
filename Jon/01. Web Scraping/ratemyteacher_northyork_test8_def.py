@@ -363,6 +363,7 @@ from urllib.request import Request, urlopen
 import pandas
 import re
 
+#test: def creation to replace whitespaces in province and city_name's with hyphens and also return last page of the city
 def test( province, city_name):
   if ' ' in province:
     prov = province.replace(' ','-')
@@ -386,10 +387,14 @@ def test( province, city_name):
 
   return prov, city, base_url, last_pg;
 
-
-
 print(test("New Brunswick","Ste Anne De Madawaska"))
 
+
+#Function to do the following:
+#1. Take city and province as input
+#2. Replace whitespaces in inputs with hyphen
+#3. Get last page of the link for the particular city and province from inputs
+#4. Loop through each page of the particular city and province and gets the 4 lists (schools, types, ratings, counts)
 
 #create a test function to convert province and city with hyphens and get the last page
 #if only 1 page, the find('li') will be None
@@ -474,3 +479,19 @@ last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]
 ##########################################################################################
 #   STEP 10 - Setup time interval for scraping the data to prevent crashing the server   #
 ##########################################################################################
+
+##################################################
+# TESTING FROM WEB TUTORIALS                     #
+#def sum( arg1, arg2 ):
+   # Add both the parameters and return them."
+#   total = arg1 + arg2
+#   print ("Inside the function : ", total)
+#   return total;
+
+# Now you can call sum function
+#total = sum( 10, 20 );
+#print ("Outside the function : ", total)
+
+#total
+#################################################
+
