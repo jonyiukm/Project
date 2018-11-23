@@ -434,8 +434,29 @@ len(test_school_list)
 test_school_list
  
 
-# Write 2 for loops to grab a list of province and every city within the province
-# first loop to get the list of city within 1 province
+# End Goal: Write 2 for loops to grab a list of province and every city within the province
+# 1). Grab the list of province
+# 2). Iterate to grab every city's name within 1 province
+# 3). Combine 1 and 2
+# 4). Combine 3 with the test function above
+
+prov_url = "htps://ca.ratemyteachers.com/"
+r1 = Request(prov_url, headers={'User-Agent': 'Mozilla/5.0'})
+c1 = urlopen(r1).read()
+soup_prov = BeautifulSoup(c1, "lxml")
+prov_lst = [x.text.strip() for x in soup_prov.findAll('div', {'class': 'state'})]
+
+#should show 13 provinces in Canada in list format
+prov_lst
+
+
+
+
+
+
+
+
+#####################################################################################################
 base_home_page="https://ca.ratemyteachers.com/ontario" 
 r1 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
 c1 = urlopen(r1).read()
