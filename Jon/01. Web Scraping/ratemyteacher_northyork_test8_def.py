@@ -363,38 +363,12 @@ from urllib.request import Request, urlopen
 import pandas
 import re
 
-#test: def creation to replace whitespaces in province and city_name's with hyphens and also return last page of the city
-def test( province, city_name):
-  if ' ' in province:
-    prov = province.replace(' ','-')
-    #return prov;
-
-  if ' ' in city_name:
-    city = city_name.replace(' ','-')
-    #return city;
-  
-  base_url="https://ca.ratemyteachers.com/" + str(prov) + "/" + str(city) + "/"
-  r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
-  c0 = urlopen(r0).read()
-  soup0 = BeautifulSoup(c0,'lxml')
-
-  #check last page  
-  if soup0.find('li', attrs={'class':'last_page'}) is not None:
-    last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
-  else:
-    last_pg='1'
-  #return last_pg;
-
-  return prov, city, base_url, last_pg;
-
-print(test("New Brunswick","Ste Anne De Madawaska"))
-
-
 #Function to do the following:
 #1. Take city and province as input
 #2. Replace whitespaces in inputs with hyphen
 #3. Get last page of the link for the particular city and province from inputs
-#4. Loop through each page of the particular city and province and gets the 4 lists (schools, types, ratings, counts)
+#4. Loop through each page of the particular city and province
+#5. Return 6 lists (province, city, schools, types, ratings, counts)
 
 #create a test function to convert province and city with hyphens and get the last page
 #if only 1 page, the find('li') will be None
@@ -402,16 +376,16 @@ print(test("New Brunswick","Ste Anne De Madawaska"))
 #Seems to work
 def test( province, city_name):
   if ' ' in province:
-    prov = province.replace(' ','-')
+    prov0 = province.replace(' ','-')
   else:
-    prov = province
+    prov0 = province
 
   if ' ' in city_name:
-    city = city_name.replace(' ','-')
+    city0 = city_name.replace(' ','-')
   else:
-    city = city_name
+    city0 = city_name
   
-  base_url="https://ca.ratemyteachers.com/" + str(prov) + "/" + str(city) + "/"
+  base_url="https://ca.ratemyteachers.com/" + str(prov0) + "/" + str(city0) + "/"
   r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
   c0 = urlopen(r0).read()
   soup0 = BeautifulSoup(c0,'lxml')
@@ -423,6 +397,8 @@ def test( province, city_name):
     last_pg='1'
   
   #Create Empty Lists for results
+  prov = []
+  city = []
   school = []
   institution = []
   ratings = []
@@ -432,8 +408,11 @@ def test( province, city_name):
     url = base_url+str(page_number)
     r = Request(base_url+str(page_number),headers={'User-Agent':'Mozilla/5.0'})
     c = urlopen(r).read()
+
     soup = BeautifulSoup(c,'lxml')
  
+    prov = prov + [prov0 for x in range(0,len(soup.findAll('h3',class_= 'school_name')))]
+    city = city + [city0 for x in range(0,len(soup.findAll('h3',class_= 'school_name')))]
     #.extend has to be in a separate line because the function extend is an in-place function, ie it will make the changes to the original list and return None
     school = school + [x.a.text.strip() for x in soup.findAll('h3',class_= 'school_name')]
     
@@ -448,34 +427,26 @@ def test( province, city_name):
 #print(test("New Brunswick","Ste Anne De Madawaska"))
 #print(test("ontario","north York"))
 test1 = test("ontario","north york")
-test_school_list = test1[4]
-type(test_school_list)
 
+test_school_list = test1[1]
 
+len(test_school_list)
+test_school_list
+ 
 
+# Write 2 for loops to grab a list of province and every city within the province
+# first loop to get the list of city within 1 province
+base_home_page="https://ca.ratemyteachers.com/ontario" 
+r1 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
+c1 = urlopen(r1).read()
+soup1 = BeautifulSoup(c1,'lxml')
 
-
-
-
-################################################################################################################################
-rt = Request('https://ca.ratemyteachers.com/new-brunswick/ste-anne-de-madawaska', headers={'User-Agent':'Mozilla/5.0'})
-ct = urlopen(rt).read()
-soupt = BeautifulSoup(ct,'lxml')
-last_pg_t=soupt.find('li', attrs={'class':'last_page'}).a['href'][-1]    
-
-last_pg_t=soupt.find('li', attrs={'class':'last_page'})
-
-last_pg_t
-
-
-#Base URL and get the last page in string
-base_url = 'https://ca.ratemyteachers.com/ontario/north-york/'
-r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
-c0 = urlopen(r0).read()
-soup0 = BeautifulSoup(c0,'lxml')
-last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
-
-
+  #check last page  
+  if soup0.find('li', attrs={'class':'last_page'}) is not None:
+    last_pg=soup0.find('li', attrs={'class':'last_page'}).a['href'][-1]    
+  else:
+    last_pg='1'
+  
 ##########################################################################################
 #   STEP 10 - Setup time interval for scraping the data to prevent crashing the server   #
 ##########################################################################################
