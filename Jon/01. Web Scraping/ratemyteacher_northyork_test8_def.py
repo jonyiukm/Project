@@ -440,7 +440,7 @@ test_school_list
 # 3). Combine 1 and 2
 # 4). Combine 3 with the test function above
 
-prov_url = "htps://ca.ratemyteachers.com/"
+prov_url = "https://ca.ratemyteachers.com/"
 r1 = Request(prov_url, headers={'User-Agent': 'Mozilla/5.0'})
 c1 = urlopen(r1).read()
 soup_prov = BeautifulSoup(c1, "lxml")
