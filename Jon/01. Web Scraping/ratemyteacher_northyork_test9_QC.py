@@ -362,8 +362,8 @@ from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 import pandas
 import re
-from time import sleep
-from random import randint
+#from time import sleep
+#from random import randint
 
 #Function to do the following:
 #1. Take city and province as input
@@ -392,7 +392,6 @@ def test( province, city_name):
   base_url="https://ca.ratemyteachers.com/" + str(prov0) + "/" + str(city0) + "/"
   r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
   c0 = urlopen(r0).read()
-  sleep(randint(8,16))
   soup0 = BeautifulSoup(c0,'lxml')
 
   #check last page  
@@ -413,7 +412,6 @@ def test( province, city_name):
     url = base_url+str(page_number)
     r = Request(base_url+str(page_number),headers={'User-Agent':'Mozilla/5.0'})
     c = urlopen(r).read()
-    sleep(randint(5,10))
     soup = BeautifulSoup(c,'lxml')
  
     prov = prov + [prov0 for x in range(0,len(soup.findAll('h3',class_= 'school_name')))]
@@ -500,7 +498,7 @@ city_lst
 # NEXT STEP: use nested for loops to get a list of provinces with their corresponding cities?
 #            THEN APPLY the DEF?
 #
-# 20181125 - trial run...taking a long time
+# 20181127 - trial run
 import urllib
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
@@ -536,7 +534,7 @@ def test( province, city_name):
   base_url="https://ca.ratemyteachers.com/" + str(prov0) + "/" + str(city0) + "/"
   r0 = Request(base_url, headers={'User-Agent':'Mozilla/5.0'})        
   c0 = urlopen(r0).read()
-  sleep(randint(8,16))
+  #sleep(randint(8,16))
   soup0 = BeautifulSoup(c0,'lxml')
 
   #check last page  
@@ -557,7 +555,7 @@ def test( province, city_name):
     url = base_url+str(page_number)
     r = Request(base_url+str(page_number),headers={'User-Agent':'Mozilla/5.0'})
     c = urlopen(r).read()
-    sleep(randint(5,10))
+    sleep(randint(1,3))
     soup = BeautifulSoup(c,'lxml')
  
     prov = prov + [prov0 for x in range(0,len(soup.findAll('h3',class_= 'school_name')))]
@@ -571,7 +569,7 @@ def test( province, city_name):
     
     count = count + [x.text.strip().replace('\nratings','').replace('\nrating','') for x in soup.findAll('div',{'class': 'rating_count'})]
  
-  return prov, city, base_url, last_pg, school, institution, ratings, count;
+  return prov, city, school, institution, ratings, count;
 
 prov_url = "https://ca.ratemyteachers.com/"
 r1 = Request(prov_url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -592,7 +590,6 @@ for prov in prov_lst:
     city_url = "https://ca.ratemyteachers.com/" + str(prov.replace(' ','-')) + '/' + '1'
     r2 = Request(city_url, headers={'User-Agent': 'Mozilla/5.0'})
     c2 = urlopen(r2).read()
-    sleep(randint(6,13))
     soup_city = BeautifulSoup(c2,"lxml")
 
     if len(soup_city.findAll('div', {'class': 'text'}))>1:
@@ -606,13 +603,12 @@ for prov in prov_lst:
         url = city_url_1+str(page)
         r3 = Request(city_url_1+str(page),headers={'User-Agent':'Mozilla/5.0'})
         c3 = urlopen(r3).read()
-        sleep(randint(8,17))
         soup3 = BeautifulSoup(c3,"lxml")
     
         #get last page of each province for the list of cities
         full_prov_lst = full_prov_lst + [prov for x in range(0,len(soup3.findAll('div', {'class': 'city'})))]
         city_lst = city_lst + [x.text.strip() for x in soup3.findAll('div', {'class': 'city'})]
-        sleep(randint(6,13))
+        
         #Not Working!!
         # CURRENT PROBLEM! Province 13 , city -26xx instead of different numbers per province
         # cant assign the test function from above yet...
@@ -625,9 +621,13 @@ len(full_prov_lst)
 city_lst
 len(city_lst)
 
+
+
+#start running at 01:00am @ 20181127
 for x in range(0, len(city_lst)):
     final_list = test(full_prov_lst[x], city_lst[x])
-    sleep(randint(6,13))
+    sleep(randint(5,8))
+
 
 
     
