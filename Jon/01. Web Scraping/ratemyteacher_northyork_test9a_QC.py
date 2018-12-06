@@ -646,7 +646,13 @@ len(city_lst)
 for x in range(0, len(city_lst)):
     final_list = final_list + test(full_prov_lst[x], city_lst[x])
     
-
+# Update: problem with the test function is it created a tuple which can not be "modified"
+# Try: adding List(xxxxxx,xxx,xx,x,xx) after return to turn the output into a list
+# THEN try zip to combined them together
+#sample code: [item for items in zip(date_list, num_list_1, num_list_2) for item in items]
+    
+    
+    
 len(final_list)
 
     
